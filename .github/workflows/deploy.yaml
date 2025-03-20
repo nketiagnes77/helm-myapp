@@ -28,22 +28,18 @@ jobs:
       - name: Create or Update ArgoCD Application
         run: |
           argocd app create my-app \
-            --upsert  # Added to allow updates to existing app
             --repo https://github.com/nketiagnes77/helm-myapp.git \
             --path . \
-            --dest-server https://kubernetes.default.svc \
+            --dest-server https://kubernetes.default.svc \  # Replace if needed
             --dest-namespace default \
             --sync-policy automated \
             --auto-prune \
             --self-heal \
-            --helm-set replicaCount=2  # Optional: customize Helm values
+            --helm-set replicaCount=2 \
+            --upsert
           argocd app sync my-app
           argocd app wait my-app --health
-
-      - name: Sync Application
-        run: |
-          argocd app sync my-app
-          argocd app wait my-app --health
+        shell: /usr/bin/bash -e {0}
 
       - name: Log out from ArgoCD
         run: argocd logout ${{ secrets.ARGOCD_SERVER }}
