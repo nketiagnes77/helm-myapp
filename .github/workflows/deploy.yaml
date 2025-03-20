@@ -25,6 +25,20 @@ jobs:
             --password ${{ secrets.ARGOCD_PASSWORD }} \
             --insecure
 
+      - name: Create or Update ArgoCD Application
+        run: |
+          argocd app create my-app \
+            --repo https://github.com/nketiagnes77/helm-myapp.git \
+            --path . \
+            --dest-server https://kubernetes.default.svc \
+            --dest-namespace default \
+            --sync-policy automated \
+            --auto-prune \
+            --self-heal \
+            --helm-set replicaCount=2  # Optional: customize Helm values
+          argocd app sync my-app
+          argocd app wait my-app --health
+
       - name: Sync Application
         run: |
           argocd app sync my-app
